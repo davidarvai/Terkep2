@@ -5,7 +5,11 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,7 +35,9 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +47,13 @@ public class MainActivity extends AppCompatActivity {
     FusedLocationProviderClient fusedLocationProviderClient;
 
     List<LatLng> busStopLocations;
+
+    // Kereső mező
+    EditText searchEditText;
+
+    // Google Térkép példány
+    GoogleMap googleMap;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +77,21 @@ public class MainActivity extends AppCompatActivity {
         busStopLocations.add(new LatLng(46.5376421, 24.4692577));
         busStopLocations.add(new LatLng(46.5347231, 24.546086));
 
+        searchEditText = findViewById(R.id.searchBtn);
+
+        // Inicializálja a kereső mezőt
+        searchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    performSearch();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+
         Dexter.withContext(getApplicationContext()).withPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
                 .withListener(new PermissionListener() {
                     @Override
@@ -83,6 +111,31 @@ public class MainActivity extends AppCompatActivity {
                 }).check();
         showBusStopLocation();
     }
+
+    private void performSearch() {
+        String searchText = searchEditText.getText().toString().toLowerCase();
+
+        googleMap.clear();
+
+        for (LatLng location : busStopLocations) {
+
+            String locationName = getLocationName(location).toLowerCase();
+            if (locationName.contains(searchText)) {
+                // Megtaláltuk a keresett helyet, hozzáadjuk a térképhez
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(location)
+                        .title(locationName)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                googleMap.addMarker(markerOptions);
+            }
+        }
+    }
+
+    private String getLocationName(LatLng location) {
+        int locationIndex = busStopLocations.indexOf(location);
+        return "Place " + (locationIndex + 1);
+    }
+
 
     private void showBusStopLocation() {
         supportMapFragment.getMapAsync(new OnMapReadyCallback() {
