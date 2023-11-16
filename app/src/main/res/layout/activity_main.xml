@@ -12,24 +12,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView"
+    <SearchView
+        android:id="@+id/mapSearch"
         android:layout_width="match_parent"
-        android:layout_height="57dp"
-        android:layout_gravity="top"
-        android:background="@android:color/white"
-        android:hint="Keresés városokra, utakra és helyekre" />
-
-    <ImageView
-        android:id="@+id/searchBtn"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/autoCompleteTextView"
-        android:layout_alignEnd="@id/autoCompleteTextView"
-        android:layout_marginTop="19dp"
-        android:layout_marginEnd="16dp"
-        android:clickable="true"
-        android:src="@drawable/baseline_search_24" />
+        android:layout_margin="10dp"
+        android:queryHint="Search..."
+        android:iconifiedByDefault="false"
+        android:elevation="5dp"
+        android:background="@drawable/bg_search"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+
 
 
 </RelativeLayout>
